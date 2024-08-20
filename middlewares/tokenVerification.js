@@ -4,7 +4,6 @@ const CustomError = require("../utils/customError");
 module.exports = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    console.log(authHeader);
 
     if (!authHeader) {
       return next(new CustomError("Please login first", 401));
