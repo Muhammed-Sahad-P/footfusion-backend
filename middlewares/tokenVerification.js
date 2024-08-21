@@ -1,26 +1,27 @@
 const jwt = require("jsonwebtoken");
 const CustomError = require("../utils/customError");
 
-module.exports = (req, res, next) => {
+const tokenVerification = (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-      return next(new CustomError("Please login first", 401));
+    const authHeader = req.headers.token;
+    if (authHeader) {
+      const token = authHeader.split(" ")[1];
+      jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+        if (err) throw new CustomError("Token is not valid", 403);
+        else {
+          req.user = user;
+          next();
+        }
+      });
+    } else {
+      throw new CustomError("You are not authenticated", 403);
     }
-    const token = authHeader.split(" ")[1];
-
-    if (!token) {
-      return next(new CustomError("Please login first", 401));
-    }
-    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, userId) => {
-      if (err) {
-        return next(new CustomError("Please login first", 401));
-      }
-      req.userId = userId;
-      next();
-    });
-  } catch (err) {
-    return next(new CustomError(err, 401));
+  } catch (error) {
+    throw new CustomError(
+      error.message || "Failed to verify authentication",
+      500
+    );
   }
 };
+
+module.exports = tokenVerification;
