@@ -6,12 +6,20 @@ const addToCart = async (req, res, next) => {
   try {
     const { productId, quantity, userId } = req.body;
 
+    if (!productId || !quantity || !userId) {
+      return next(
+        new CustomError("productId, quantity, and userId are required", 400)
+      );
+    }
+
     const cart = await Cart.findOne({ userId });
+
     if (!cart) {
       const newCart = new Cart({
         userId,
         products: [{ productId, quantity }],
       });
+
       await newCart.save();
       return res.status(201).json(newCart);
     }
@@ -19,17 +27,19 @@ const addToCart = async (req, res, next) => {
     const existingProduct = cart.products.find(
       (item) => item.productId.toString() === productId
     );
+
     if (existingProduct) {
       existingProduct.quantity += quantity;
-      await cart.save();
-      return res.status(200).json(cart);
+    } else {
+      cart.products.push({ productId, quantity });
     }
 
-    cart.products.push({ productId, quantity });
     await cart.save();
     return res.status(200).json(cart);
   } catch (error) {
-    return next(new CustomError(error, 500));
+    return next(
+      new CustomError(error.message || "Failed to add product to cart", 500)
+    );
   }
 };
 
@@ -103,7 +113,9 @@ const removeCart = async (req, res, next) => {
 
     if (cart.products.length === 0) {
       await Cart.deleteOne({ _id: cart._id });
-      return res.status(200).json({ message: "Cart item deleted successfully" });
+      return res
+        .status(200)
+        .json({ message: "Cart item deleted successfully" });
     }
     await cart.save();
     return res
