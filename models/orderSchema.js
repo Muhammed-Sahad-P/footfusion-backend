@@ -12,14 +12,15 @@ const orderSchema = new mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
         },
+        quantity: { type: Number, required: true, default: 1 },
       },
     ],
     purchaseDate: {
       type: Date,
       default: Date.now,
     },
-    totalPrice: Number,
-    totalItems: Number,
+    amount: { type: Number, required: true },
+    address: { type: Object, required: true },
   },
   { timestamps: true }
 );

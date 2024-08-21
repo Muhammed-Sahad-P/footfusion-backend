@@ -6,6 +6,7 @@ const {getUser} = require("../controllers/User/userController");
 const productController= require("../controllers/User/productController");
 const cartController = require("../controllers/User/cartController");
 const wishlistController = require("../controllers/User/wishlistController");
+const orderController = require("../controllers/User/orderController");
 
 //user routes
 router.get("/user", tokenVerification, tryCatch(getUser));//get userown data
@@ -25,5 +26,13 @@ router.delete("/cart/:userId/:productId", tokenVerification, tryCatch(cartContro
 router.post("/wishlist", tokenVerification, tryCatch(wishlistController.addToWishlist));//add to wishlist
 router.get("/wishlist/:userId", tokenVerification, tryCatch(wishlistController.getWishlist));//get wishlist
 router.delete('/wishlist/:userId/:productId', tokenVerification, tryCatch(wishlistController.deleteWishlist));//delete wishlist
+
+//order routes
+router.post("/orders", tokenVerification, tryCatch(orderController.createOrder));//create order
+router.get("/orders", tokenVerification, tryCatch(orderController.getAllOrders));//get all orders
+router.get("/orders/:orderId", tokenVerification, tryCatch(orderController.getOrderById));//get orders by user
+router.delete('/orders/:orderId', tokenVerification, tryCatch(orderController.cancelOrder));//cancel order
+
+
 
 module.exports = router
