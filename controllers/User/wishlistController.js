@@ -44,6 +44,11 @@ const getWishlist = async (req, res, next) => {
     if (!wishlist) {
       return next(new CustomError("Wishlist not found", 404));
     }
+
+    if (wishlist.products.length === 0) {
+      return next(new CustomError("Wishlist is empty", 404));
+    }
+
     res.status(200).json(wishlist);
   } catch (error) {
     return next(
