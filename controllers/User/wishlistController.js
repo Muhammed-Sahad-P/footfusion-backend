@@ -1,0 +1,92 @@
+const Wishlist = require("../../models/wishlistSchema");
+const CustomError = require("../../utils/customError");
+
+//add to wishlist
+const addToWishlist = async (req, res, next) => {
+  try {
+    const { userId, productId } = req.body;
+
+    if (!userId || !productId) {
+      return next(new CustomError("userId and productId are required", 400));
+    }
+
+    let wishlist = await Wishlist.findOne({ userId });
+
+    if (wishlist) {
+      const productExists = wishlist.products.some(
+        (item) => item.toString() === productId
+      );
+
+      if (productExists) {
+        return next(new CustomError("Product already in wishlist", 400));
+      }
+
+      wishlist.products.push(productId);
+    } else {
+      wishlist = new Wishlist({ userId, products: [productId] });
+    }
+
+    await wishlist.save();
+    res.status(201).json({ message: "Product added to wishlist", wishlist });
+  } catch (error) {
+    return next(
+      new CustomError(error.message || "Failed to add product to wishlist", 500)
+    );
+  }
+};
+
+//get wishlist
+const getWishlist = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const wishlist = await Wishlist.findOne({ userId });
+
+    if (!wishlist) {
+      return next(new CustomError("Wishlist not found", 404));
+    }
+    res.status(200).json(wishlist);
+  } catch (error) {
+    return next(
+      new CustomError(error.message || "Failed to get wishlist", 500)
+    );
+  }
+};
+
+//delete wishlist
+const deleteWishlist = async (req, res, next) => {
+  try {
+    const { productId, userId } = req.params;
+    console.log("Product ID:", productId, "User ID:", userId);
+
+    if (!productId) {
+      return next(new CustomError("productId is required", 400));
+    }
+
+    const wishlist = await Wishlist.findOne({ userId });
+    console.log("Wishlist:", wishlist);
+
+    if (!wishlist) {
+      return next(new CustomError("Wishlist not found", 404));
+    }
+
+    await wishlist.updateOne({ $pull: { products: productId } });
+
+    const updatedWishlist = await Wishlist.findOne({ userId });
+    if (
+      updatedWishlist.products.some((item) => item.toString() === productId)
+    ) {
+      return next(new CustomError("Product not found in wishlist", 404));
+    }
+
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    return next(
+      new CustomError(
+        error.message || "Failed to delete product from wishlist",
+        500
+      )
+    );
+  }
+};
+
+module.exports = { addToWishlist, getWishlist, deleteWishlist };
