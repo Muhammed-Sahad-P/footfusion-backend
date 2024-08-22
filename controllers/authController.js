@@ -23,7 +23,7 @@ const Register = async (req, res) => {
 const Login = async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(new CustomError("user not", 404));
+    return next(new CustomError("user not found", 404));
   }
   const isMatch = await bcrypt.compare(req.body.password, user.password);
 
