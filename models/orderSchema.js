@@ -5,24 +5,20 @@ const orderSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
-    products: [
+    Products: [
       {
         productId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
+          required: true,
         },
-        quantity: { type: Number, required: true, default: 1 },
+        quantity: { type: Number, required: true },
       },
     ],
-    purchaseDate: {
-      type: Date,
-      default: Date.now,
-    },
-    amount: { type: Number, required: true },
-    address: { type: Object, required: true },
+    totalprice: { type: Number, required: true },
   },
   { timestamps: true }
 );
-
 module.exports = mongoose.model("Order", orderSchema);

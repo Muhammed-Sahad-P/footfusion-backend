@@ -4,10 +4,9 @@ const CustomError = require("../../utils/customError");
 // add to cart
 const addToCart = async (req, res, next) => {
   try {
-    const { productId, quantity, userId } = req.body;
-    const quantityNumber = parseInt(quantity);
+    const { productId, quantity, userId, price } = req.body;
 
-    if (!productId || !quantityNumber || !userId) {
+    if (!productId || !quantity || !userId || !price) {
       return next(
         new CustomError("productId, quantity, and userId are required", 400)
       );
@@ -18,7 +17,7 @@ const addToCart = async (req, res, next) => {
     if (!cart) {
       const newCart = new Cart({
         userId,
-        products: [{ productId, quantityNumber }],
+        products: [{ productId, quantity, price }],
       });
 
       await newCart.save();

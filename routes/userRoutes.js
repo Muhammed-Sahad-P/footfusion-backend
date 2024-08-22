@@ -12,9 +12,9 @@ const orderController = require("../controllers/User/orderController");
 router.get("/user", tokenVerification, tryCatch(getUser));//get userown data
 
 //product routes
-router.get("/products", tokenVerification, tryCatch(productController.getAllProducts));//get all products
-router.get("/product/:productId", tokenVerification, tryCatch(productController.getProductById));//get single product
-router.get("/products/:category", tokenVerification, tryCatch(productController.getProductsByCategory));//get products by category
+router.get("/products", tryCatch(productController.getAllProducts));//get all products
+router.get("/product/:productId", tryCatch(productController.getProductById));//get single product
+router.get("/products/:category", tryCatch(productController.getProductsByCategory));//get products by category
 
 //cart routes
 router.post("/cart", tokenVerification, tryCatch(cartController.addToCart));//add to cart
