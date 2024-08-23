@@ -24,4 +24,14 @@ const tokenVerification = (req, res, next) => {
   }
 };
 
-module.exports = tokenVerification;
+const adminVerification = (req, res, next) => {
+  tokenVerification(req, res, () => {
+    if (req.user.isAdmin) {
+      next();
+    } else {
+      throw new CustomError("You are not an authorization", 403);
+    }
+  });
+};
+
+module.exports = { tokenVerification, adminVerification };
