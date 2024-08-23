@@ -45,7 +45,6 @@ const deleteUser = async (req, res, next) => {
   if (!user) {
     return next(new CustomError("User not found", 404));
   }
-  await user.remove();
   res.status(200).json({ message: "User deleted successfully" });
 };
 

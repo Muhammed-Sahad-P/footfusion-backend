@@ -13,9 +13,10 @@ const loginSchema = Joi.object({
 
 const createProductSchema = Joi.object({
   name: Joi.string().min(3).required(),
-  description: Joi.string().required(),
+  description: Joi.string().optional(),
   price: Joi.number().min(0).required(),
   image: Joi.string().optional(),
+  category: Joi.string().required(),
 });
 
 module.exports = { registerSchema, loginSchema, createProductSchema };

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express();
 const tryCatch = require("../utils/tryCatch");
-const tokenVerification = require("../middlewares/tokenVerification");
+const {tokenVerification} = require("../middlewares/tokenVerification");
 const {getUser} = require("../controllers/User/userController");
 const productController= require("../controllers/User/productController");
 const cartController = require("../controllers/User/cartController");

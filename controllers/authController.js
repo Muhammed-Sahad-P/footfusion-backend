@@ -30,6 +30,7 @@ const Login = async (req, res, next) => {
   if (!isMatch) {
     return next(new CustomError("Invalid email or password", 400));
   }
+console.log(user.isAdmin);
 
   const token = jwt.sign(
     {

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express();
 const tryCatch = require("../utils/tryCatch");
-const adminVerification = require("../middlewares/adminVerification");
+const {adminVerification} = require("../middlewares/tokenVerification");
 const admUserController = require("../controllers/Admin/admUserController");
 const admProductController = require("../controllers/Admin/admProductController");
 
@@ -12,8 +12,8 @@ router.put('/users/:id',adminVerification, tryCatch(admUserController.updateUser
 router.delete('/users/:id',adminVerification, tryCatch(admUserController.deleteUser));//delete user
 
 //product routes
-router.get('/product',adminVerification, tryCatch(admProductController.createProduct));//create product
-router.get('./products',adminVerification, tryCatch(admProductController.getAllProducts));//get all products
+router.post('/product',adminVerification, tryCatch(admProductController.createProduct));//create product
+router.get('/products',adminVerification, tryCatch(admProductController.getAllProducts));//get all products
 router.put('/product/:productId',adminVerification, tryCatch(admProductController.updateProduct));//update product
 router.delete('/product/:productId',adminVerification, tryCatch(admProductController.deleteProduct));//delete product
 
