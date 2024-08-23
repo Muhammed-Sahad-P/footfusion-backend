@@ -29,9 +29,9 @@ const addToCart = async (req, res, next) => {
     );
 
     if (existingProduct) {
-      existingProduct.quantity += quantityNumber;
+      existingProduct.quantity += quantity;
     } else {
-      cart.products.push({ productId, quantityNumber });
+      cart.products.push({ productId, quantity, price });
     }
 
     await cart.save();
