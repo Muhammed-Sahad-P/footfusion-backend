@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const cors = require("cors");
 const errorHandler = require("./middlewares/errorHandler");
 const connectDB = require("./config/connectDB");
 const userRoutes = require("./routes/userRoutes");
@@ -12,7 +13,7 @@ connectDB();
 
 const app = express();
 app.use(express.json());
-
+app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);

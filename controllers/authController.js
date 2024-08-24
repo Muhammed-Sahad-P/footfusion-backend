@@ -6,15 +6,22 @@ const CustomError = require("../utils/customError");
 //User Register
 const Register = async (req, res) => {
   console.log(req.body);
-  const { name, email, password } = req.body;
+  const { fullName, email, password } = req.body;
+
+  const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
   
   const saltRounds = parseInt(process.env.SALT_ROUNDS, 10);
   const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+  
   const newUser = new User({
-    name,
+    fullName,
     email,
     password: hashedPassword,
   });
+
   const savedUser = await newUser.save();
   res.status(201).json({datas:savedUser,password:hashedPassword});
 };
@@ -42,7 +49,7 @@ console.log(user.isAdmin);
       expiresIn: "1d",
     }
   );
-  res.status(200).json({ token });
-};
+  res.status(200).json({ token, isAdmin: user.isAdmin,user});
+}
 
 module.exports = { Register, Login };
