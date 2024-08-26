@@ -3,10 +3,11 @@ const CustomError = require("../../utils/customError");
 
 // add to cart
 const addToCart = async (req, res, next) => {
+  console.log("Request Body:", req.body);
   try {
-    const { productId, quantity, userId, price } = req.body;
+    const { productId, userId, quantity = 1 } = req.body;
 
-    if (!productId || !quantity || !userId || !price) {
+    if (!productId || !userId) {
       return next(
         new CustomError("productId, quantity, and userId are required", 400)
       );
@@ -17,7 +18,7 @@ const addToCart = async (req, res, next) => {
     if (!cart) {
       const newCart = new Cart({
         userId,
-        products: [{ productId, quantity, price }],
+        products: [{ productId, quantity }],
       });
 
       await newCart.save();
@@ -31,7 +32,7 @@ const addToCart = async (req, res, next) => {
     if (existingProduct) {
       existingProduct.quantity += quantity;
     } else {
-      cart.products.push({ productId, quantity, price });
+      cart.products.push({ productId, quantity });
     }
 
     await cart.save();
@@ -47,7 +48,7 @@ const addToCart = async (req, res, next) => {
 const getCart = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.findOne({ userId }).populate("products.productId");
     if (!cart) {
       return next(new CustomError("Cart not found", 404));
     }
@@ -61,32 +62,52 @@ const getCart = async (req, res, next) => {
 const updateCart = async (req, res, next) => {
   try {
     const { productId, userId } = req.params;
-    const { quantity } = req.body;
+    const { action } = req.body;
 
-    if (quantity < 1) {
-      return next(new CustomError("Quantity must be greater than 1", 400));
-    }
-    const cart = await Cart.findOne({ userId });
+    // Find the cart by userId
+    const cart = await Cart.findOne({ userId }).populate("products.productId");
     if (!cart) {
       return next(new CustomError("Cart not found", 404));
     }
 
+    // Find the product in the cart
     const product = cart.products.find(
-      (item) => item.productId.toString() === productId
+      (item) => item.productId._id.toString() === productId
     );
 
     if (!product) {
       return next(new CustomError("Product not found in cart", 404));
     }
 
-    product.quantity = quantity;
+    // Handle increment or decrement action
+    if (action === "increment") {
+      product.quantity += 1;
+    } else if (action === "decrement") {
+      if (product.quantity > 1) {
+        product.quantity -= 1;
+      } else {
+        // Remove the product if the quantity is reduced to 0 or less
+        cart.products = cart.products.filter(
+          (item) => item.productId._id.toString() !== productId
+        );
+      }
+    } else {
+      return next(new CustomError("Invalid action for updating quantity", 400));
+    }
 
+    // Save the updated cart
     await cart.save();
-    return res.status(200).json({ message: "Cart updated successfully", cart });
+
+    // Retrieve the updated cart with populated products
+    const updatedCart = await Cart.findOne({ userId }).populate(
+      "products.productId"
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Cart updated successfully", cart: updatedCart });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: error.message, message: "Something went wrong" });
+    return next(new CustomError(error.message || "Something went wrong", 500));
   }
 };
 
@@ -110,17 +131,14 @@ const removeCart = async (req, res, next) => {
     cart.products = cart.products.filter(
       (item) => item.productId.toString() !== productId
     );
-
-    if (cart.products.length === 0) {
-      await Cart.deleteOne({ _id: cart._id });
-      return res
-        .status(200)
-        .json({ message: "Cart item deleted successfully" });
-    }
     await cart.save();
+    const updatedCart = await Cart.findOne({ userId }).populate(
+      "products.productId"
+    );
+
     return res
       .status(200)
-      .json({ message: "Product removed successfully", cart });
+      .json({ message: "Product removed successfully", cart: updatedCart });
   } catch (error) {
     return next(new CustomError(error, 500));
   }

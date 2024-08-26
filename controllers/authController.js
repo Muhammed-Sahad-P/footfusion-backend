@@ -9,13 +9,13 @@ const Register = async (req, res) => {
   const { fullName, email, password } = req.body;
 
   const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-  
+  if (existingUser) {
+    return res.status(400).json({ message: "User already exists" });
+  }
+
   const saltRounds = parseInt(process.env.SALT_ROUNDS, 10);
   const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-  
+
   const newUser = new User({
     fullName,
     email,
@@ -23,7 +23,7 @@ const Register = async (req, res) => {
   });
 
   const savedUser = await newUser.save();
-  res.status(201).json({datas:savedUser,password:hashedPassword});
+  res.status(201).json({ datas: savedUser, password: hashedPassword });
 };
 
 //User Login
@@ -37,7 +37,7 @@ const Login = async (req, res, next) => {
   if (!isMatch) {
     return next(new CustomError("Invalid email or password", 400));
   }
-console.log(user.isAdmin);
+  console.log(user.isAdmin);
 
   const token = jwt.sign(
     {
@@ -49,7 +49,13 @@ console.log(user.isAdmin);
       expiresIn: "1d",
     }
   );
-  res.status(200).json({ token, isAdmin: user.isAdmin,user});
-}
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Strict",
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+  res.status(200).json({ token, isAdmin: user.isAdmin, user });
+};
 
 module.exports = { Register, Login };
