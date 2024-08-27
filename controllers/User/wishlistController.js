@@ -39,7 +39,7 @@ const addToWishlist = async (req, res, next) => {
 const getWishlist = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const wishlist = await Wishlist.findOne({ userId });
+    const wishlist = await Wishlist.findOne({ userId }).populate("products"); // Populating the product details
 
     if (!wishlist) {
       return next(new CustomError("Wishlist not found", 404));
@@ -56,7 +56,6 @@ const getWishlist = async (req, res, next) => {
     );
   }
 };
-
 //delete wishlist
 const deleteWishlist = async (req, res, next) => {
   try {
