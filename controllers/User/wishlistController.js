@@ -10,7 +10,7 @@ const addToWishlist = async (req, res, next) => {
       return next(new CustomError("userId and productId are required", 400));
     }
 
-    let wishlist = await Wishlist.findOne({ userId });
+    let wishlist = await Wishlist.findOne({ userId }).populate("products");
 
     if (wishlist) {
       const productExists = wishlist.products.some(
