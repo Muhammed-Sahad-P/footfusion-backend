@@ -3,7 +3,6 @@ const CustomError = require("../../utils/customError");
 
 // add to cart
 const addToCart = async (req, res, next) => {
-  console.log("Request Body:", req.body);
   try {
     const { productId, userId, quantity = 1 } = req.body;
 

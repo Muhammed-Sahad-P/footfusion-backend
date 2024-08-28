@@ -32,7 +32,6 @@ const getProductsByCategory = async (req, res, next) => {
     const { category } = req.params;
 
     const products = await Product.find({ type: category });
-    console.log(products);
 
     res.status(200).json(products);
   } catch (error) {

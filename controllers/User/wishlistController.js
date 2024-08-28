@@ -26,8 +26,11 @@ const addToWishlist = async (req, res, next) => {
       wishlist = new Wishlist({ userId, products: [productId] });
     }
 
-    await wishlist.save();
-    res.status(201).json({ message: "Product added to wishlist", wishlist });
+    const result = await (await wishlist.save()).populate("products");
+
+    res
+      .status(201)
+      .json({ message: "Product added to wishlist", wishlist: result });
   } catch (error) {
     return next(
       new CustomError(error.message || "Failed to add product to wishlist", 500)
@@ -60,14 +63,12 @@ const getWishlist = async (req, res, next) => {
 const deleteWishlist = async (req, res, next) => {
   try {
     const { productId, userId } = req.params;
-    console.log("Product ID:", productId, "User ID:", userId);
 
     if (!productId) {
       return next(new CustomError("productId is required", 400));
     }
 
     const wishlist = await Wishlist.findOne({ userId });
-    console.log("Wishlist:", wishlist);
 
     if (!wishlist) {
       return next(new CustomError("Wishlist not found", 404));
