@@ -14,7 +14,7 @@ const addToWishlist = async (req, res, next) => {
 
     if (wishlist) {
       const productExists = wishlist.products.some(
-        (item) => item.toString() === productId
+        (item) => item._id.toString() === productId
       );
 
       if (productExists) {
