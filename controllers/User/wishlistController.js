@@ -10,30 +10,52 @@ const addToWishlist = async (req, res, next) => {
       return next(new CustomError("userId and productId are required", 400));
     }
 
+    // Find the user's wishlist
     let wishlist = await Wishlist.findOne({ userId }).populate("products");
 
     if (wishlist) {
+      // Check if the product already exists in the wishlist
       const productExists = wishlist.products.some(
         (item) => item._id.toString() === productId
       );
 
       if (productExists) {
-        return next(new CustomError("Product already in wishlist", 400));
+        // Remove the product from the wishlist
+        wishlist.products = wishlist.products.filter(
+          (item) => item._id.toString() !== productId
+        );
+        await wishlist.save();
+        return res
+          .status(200)
+          .json({
+            message: "Product removed from wishlist",
+            wishlist: await wishlist.populate("products"),
+          });
+      } else {
+        // Add the product to the wishlist
+        wishlist.products.push(productId);
+        await wishlist.save();
+        return res
+          .status(200)
+          .json({
+            message: "Product added to wishlist",
+            wishlist: await wishlist.populate("products"),
+          });
       }
-
-      wishlist.products.push(productId);
     } else {
+      // Create a new wishlist if it doesn't exist and add the product
       wishlist = new Wishlist({ userId, products: [productId] });
+      const result = await wishlist.save();
+      return res
+        .status(201)
+        .json({
+          message: "Product added to wishlist",
+          wishlist: await result.populate("products"),
+        });
     }
-
-    const result = await (await wishlist.save()).populate("products");
-
-    res
-      .status(201)
-      .json({ message: "Product added to wishlist", wishlist: result });
   } catch (error) {
     return next(
-      new CustomError(error.message || "Failed to add product to wishlist", 500)
+      new CustomError(error.message || "Failed to update wishlist", 500)
     );
   }
 };

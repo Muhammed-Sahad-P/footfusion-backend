@@ -5,7 +5,6 @@ const CustomError = require("../utils/customError");
 
 //User Register
 const Register = async (req, res) => {
-  console.log(req.body);
   const { fullName, email, password } = req.body;
 
   const existingUser = await User.findOne({ email });
