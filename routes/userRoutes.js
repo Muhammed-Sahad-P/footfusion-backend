@@ -29,6 +29,7 @@ router.delete('/wishlist/:userId/:productId', tokenVerification, tryCatch(wishli
 
 //order routes
 router.post("/orders", tokenVerification, tryCatch(orderController.createOrder));//create order
+router.post("/orders/verify", tokenVerification, tryCatch(orderController.verifyPayment));
 router.get("/orders", tokenVerification, tryCatch(orderController.getAllOrders));//get all orders
 router.get("/orders/:orderId", tokenVerification, tryCatch(orderController.getOrderById));//get orders by user
 router.delete('/orders/:orderId', tokenVerification, tryCatch(orderController.cancelOrder));//cancel order
