@@ -34,8 +34,9 @@ const addToCart = async (req, res, next) => {
       cart.products.push({ productId, quantity });
     }
 
-    await cart.save();
-    return res.status(200).json(cart);
+    const savedcart = await cart.save();
+    const cartToSnd = await savedcart.populate("products.productId");
+    return res.status(200).json(cartToSnd);
   } catch (error) {
     return next(
       new CustomError(error.message || "Failed to add product to cart", 500)

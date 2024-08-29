@@ -4,7 +4,6 @@ const CustomError = require("../utils/customError");
 const tokenVerification = (req, res, next) => {
   try {
     const token = req.cookies.token;
-    console.log(token);    
     if (token) {
       jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
         if (err) throw new CustomError("Token is not valid", 403);
