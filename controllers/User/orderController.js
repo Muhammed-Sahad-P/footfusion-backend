@@ -20,7 +20,6 @@ const createOrder = async (req, res, next) => {
   try {
     const userCart = await Cart.findOne({ userId: req.user.id });
     console.log(userCart);
-    
 
     if (!userCart) {
       return next(new CustomError("Cart not found", 404));
@@ -112,7 +111,7 @@ const verifyPayment = async (req, res, next) => {
 // Get All Orders
 const getAllOrders = async (req, res, next) => {
   try {
-    const orders = await Order.findOne({ userId: req.user.id }).populate(
+    const orders = await Order.find({ userId: req.user.id }).populate(
       "products.productId"
     );
     if (!orders || orders.length === 0) {
