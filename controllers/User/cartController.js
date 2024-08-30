@@ -21,7 +21,8 @@ const addToCart = async (req, res, next) => {
       });
 
       await newCart.save();
-      return res.status(201).json(newCart);
+      const newCartToSnd = await newCart.populate("products.productId");
+      return res.status(201).json(newCartToSnd);
     }
 
     const existingProduct = cart.products.find(
