@@ -29,7 +29,7 @@ router.get('/carts/:id',adminVerification, tryCatch(admCartController.getCartByI
 //order routes
 router.get('/orders',adminVerification, tryCatch(admOrderController.getAllOrders));//get all orders of users
 router.get('/orders/:id',adminVerification, tryCatch(admOrderController.getAllOrdersOfUser));//get all orders of single user
-router.patch('/orders/:orderId',adminVerification, tryCatch(admOrderController.updateOrder));//update one order
+router.put('/orders/:orderId',adminVerification, tryCatch(admOrderController.updateOrder));//update one order
 router.delete('/orders/:orderId',adminVerification, tryCatch(admOrderController.cancelOrder));//delete one order
 
 //revenue routes
