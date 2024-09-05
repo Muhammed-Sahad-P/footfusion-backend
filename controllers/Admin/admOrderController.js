@@ -2,21 +2,37 @@ const User = require("../../models/userSchema");
 const CustomError = require("../../utils/customError");
 const Order = require("../../models/orderSchema");
 
-//get all orders
 const getAllOrders = async (req, res) => {
-  const orders = await Order.find().populate("userId");
-  res.status(200).json({ orders });
+  try {
+    const orders = await Order.find()
+      .populate({
+        path: "products.productId",
+        select: "name price image", 
+      })
+      .populate("userId");
+
+    res.status(200).json({ orders });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch orders" });
+  }
 };
 
-//get All orders by a single user
 const getAllOrdersOfUser = async (req, res, next) => {
-  const orders = await Order.find({ userId: req.params.id }).populate(
-    "products.productId"
-  ).populate("userId");
-  if (!orders || orders.length === 0) {
-    return next(new CustomError("Orders not found", 404));
+  try {
+    const orders = await Order.find({ userId: req.params.id })
+      .populate({
+        path: "products.productId",
+        select: "name price image", 
+      })
+      .populate("userId");
+
+    if (!orders || orders.length === 0) {
+      return next(new CustomError("Orders not found", 404));
+    }
+    res.status(200).json({ orders });
+  } catch (error) {
+    next(new CustomError("Failed to fetch orders", 500));
   }
-  res.status(200).json({ orders });
 };
 
 //update order
@@ -27,7 +43,9 @@ const updateOrder = async (req, res, next) => {
       $set: req.body,
     },
     { new: true }
-  ).populate("products.productId").populate("userId");
+  )
+    .populate("products.productId")
+    .populate("userId");
   if (!updatedOrder) return next(new CustomError("Order not found", 404));
   res.status(200).json(updatedOrder);
 };
