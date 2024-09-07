@@ -14,7 +14,7 @@ connectDB();
 
 const app = express();
 app.use(express.json());
-app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
+app.use(cors({ credentials: true, origin: "https://footfusion-e-commerce.vercel.app" }));
 app.use(cookieParser());
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
