@@ -71,7 +71,7 @@ const Login = async (req, res, next) => {
     const token = jwt.sign(
       {
         id: user._id,
-        isAdmin: user.isAdmin, // Include isAdmin flag
+        isAdmin: user.isAdmin, 
       },
       process.env.JWT_SECRET_KEY,
       {
@@ -82,7 +82,7 @@ const Login = async (req, res, next) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
-      sameSite: "Strict",
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
     });
     res.status(200).json({ token, isAdmin: user.isAdmin, user });
